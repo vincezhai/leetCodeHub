@@ -8,7 +8,6 @@ import java.util.List;
 
 public class L_M_3 {
     public static void main(String[] args) {
-        // test for git
         String s = "abba";
         int res = lengthOfLongestSubstring(s);
         System.out.println("res = " + res);
