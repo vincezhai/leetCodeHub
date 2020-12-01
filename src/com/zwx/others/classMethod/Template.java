@@ -27,7 +27,6 @@ public class Template {
             } catch (Exception e){
                 e.printStackTrace();
             }
-            //System.out.println("res = " + res);
         }
         return resList;
     }
