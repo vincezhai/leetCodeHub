@@ -14,3 +14,5 @@ This is my leetcode record hub.
 - git commit --amend : 撤回注释
 - git ls-files : 查看远端目录结构及文件名
 - git rm -r --cached xx.xx : 仅删除远端某些文件（-r 递归删除 --cached 仅删除远端）
+
+- git merge : 合并分支-test - 01
