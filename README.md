@@ -11,3 +11,6 @@ This is my leetcode record hub.
 - git rm -r --cached xx.xx : 仅删除远端某些文件（-r 递归删除 --cached 仅删除远端）
 - git push origin --delete xxx-branch : 删除远端分支
 
+- git tag -a v0.01 -m "version 0.0.1"
+- git push origin --tags
+
