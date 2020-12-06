@@ -28,7 +28,6 @@ public class Exam_1204 {
         test2();
         test3();
     }
-
     private static void test1() {
         int[] tasks = {0, 1, 2, 3, 4, 5};
         int[][] mutexPairs = {{1, 3}, {3, 5}};
