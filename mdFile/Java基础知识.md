@@ -1,5 +1,4 @@
 <center>Java基础知识</center>
-
 # JVM基础
 
 ## 基础结构
@@ -164,7 +163,7 @@ class Son extends Father{
 
 作用：加载class文件
 
-<img src="C:\Users\zwx\AppData\Roaming\Typora\typora-user-images\1609853265107.png" alt="1609853265107" style="zoom: 67%;" />
+<img src="image\1609853265107.png" alt="1609853265107" style="zoom: 67%;" />
 
 
 
@@ -183,7 +182,7 @@ app classLoader  ---  EXC classLoader ---  boot classLoader（最后会使用最
 
 如果最后仍然找不到可以加载的加载器，那么就会报出 class not found
 
-![1609855026358](C:\Users\zwx\AppData\Roaming\Typora\typora-user-images\1609855026358.png)
+![1609855026358](image\1609855026358.png)
 
 ### 类初始化顺序
 
@@ -275,7 +274,7 @@ private native void start0();
 
  在JDK1.8 hotspot移除了永久代用元空间(Metaspace)取而代之, 这时候字符串常量池还在堆, 运行时常量池还在方法区, 只不过方法区的实现从永久代变成了元空间(Metaspace)  
 
-![1609866665380](C:\Users\zwx\AppData\Roaming\Typora\typora-user-images\1609866665380.png)
+![1609866665380](image\1609866665380.png)
 
 ### JVM参数
 
@@ -333,12 +332,37 @@ Heap
 -Xms1m -Xmx8m -XX:+HeapDumpOnOutOfMemoryError
 ```
 
-![1609870574018](C:\Users\zwx\AppData\Roaming\Typora\typora-user-images\1609870574018.png)
+![1609870574018](image\1609870574018.png)
 
 
 
 ## GC算法
 
+![1609871221910](image\1609871221910.png)
+
+heap三大区域：
+
+- 新生代
+- 幸存区（from ， to）
+- 老年区
+
+轻GC：新生代 + 幸存区
+
+重GC：老年区
 
 
-私有的，每个线程都有一个计数器
+
+gc算法：
+
+- 标记清楚法
+- 标记压缩
+- 复制算法
+- 引用计数器
+
+
+
+### 引用计数器法
+
+![1609871391333](image\1609871391333.png)
+
+### 复制算法
