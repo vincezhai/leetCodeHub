@@ -366,3 +366,555 @@ gc算法：
 ![1609871391333](.\image\1609871391333.png)
 
 ### 复制算法
+
+
+
+
+
+# Java8新特性
+
+接口方法默认是 public abstract 的修饰符，但是jdk1.8允许在接口中写static方法
+
+```java
+interface Inter{
+    int func1();
+    default int func2(String s){return 0;}
+    static String func3(){return null;}
+}
+
+//sout getMethods()
+method = public default int kuang.newFeature.Inter.func2(java.lang.String)
+method = public abstract int kuang.newFeature.Inter.func1()
+method = public static java.lang.String kuang.newFeature.Inter.func3()
+```
+
+- default 关键词
+
+  - 只能在接口中使用
+
+  - 含义代表普通方法（需要写具体的方法体）
+  - 好处，default方法可以被重写，实现接口也可以继承这个方法，这样可以兼容，
+    【比如 有一个接口用了很久，后续要添加一个方法，
+    如果直接加，原有的实现类没实现新的方法，报错；
+    这时如果将新加的方法设置default，能够新旧类都可以正常使用】
+
+  
+
+## lambda表达式
+
+### 概念
+
+函数式表达式【函数参数  ->   函数体】【简化了匿名内部类】
+
+- 前提：抽象方法只有一个的接口（允许有其他的方法）
+-  接口默认继承Java.lang.Object，所以如果接口显示声明覆盖了Object中方法，那么也不算抽象方法。 
+- 注解： @FunctionInterface ，只是为了编译器检查方便
+
+ lambda表达式是只实现接口中唯一的抽象方法的匿名实现类
+
+### 表达式形式
+
+Lambda 表达式，也可称为闭包，允许把函数作为一个参数，使代码更简洁。
+
+Lambda 表达式简单写法
+
+不需要参数，返回值为 5 () -> 5
+
+接收一个参数(数字类型),返回其2倍的值 x -> 2 * x；
+
+接受2个参数(数字),并返回他们的差值 (x, y) -> x – y；
+
+接收2个int型整数,返回他们的和 (int x, int y) -> x + y；
+
+接受一个 string 对象,并在控制台打印,不返回任何值(看起来像是返回void) (String s) -> System.out.print(s)；
+
+
+
+快速实现接口（只有一个抽象方法的）
+
+```java
+// 创建数据（使用匿名内部类）
+List<Integer> list = new ArrayList<Integer>(){
+    {
+        add(5);
+        add(1);
+        add(6);
+        add(7);
+    }
+};
+List<Integer> list_copy = new ArrayList<>(list);
+// List<Integer> list_copy = list;
+
+//************* comparator **************
+// 匿名内部类
+list.sort(new Comparator<Integer>() {
+    @Override
+    public int compare(Integer o1, Integer o2) {
+        return o1 - o2;
+    }
+});
+// lambda表达式
+list.sort((o1,o2)->{return o1- o2;});
+
+// sout
+// 也是个labmda 表达式 
+// 【Consumer 这个接口，也是FunctionInterface接口】
+list.forEach((o)-> System.out.print(o + " "));
+
+
+
+// *****************  runnable ***********
+// 匿名内部类实现 runable 接口
+Runnable runnable1 = new Runnable() {
+    @Override
+    public void run() {
+        System.out.println("匿名内部类");
+    }
+};
+
+// 实现 runnable 接口
+Runnable runnable = ()-> System.out.println("start");
+new Thread(runnable).start();
+
+
+```
+
+
+
+### 方法引用
+
+https://segmentfault.com/a/1190000021411722
+
+:: 表示调用的方法
+
+引用方法，代替表达式中的重写的内容
+
+- 其中引用方法的参数类型 必须匹配上 默认传递的类型
+
+- 调用方法，User::static方法，实例::普通方法，类似这样
+
+  - 类 :: 实例方法
+  - 类 :: 静态方法
+  - 对象 :: 实例方法
+
+  第一种使用方式，第一个参数变成方法的接收者，并且其他参数也传递给该方法。
+  例如：
+
+  ```java
+  String :: compareToIgnoreCase 等价于 (x,y) -> x.compareToIgnoreCase(y)
+  ```
+
+  第二种使用方式，所有的参数传递给静态方法。
+  例如：
+
+  ```java
+  Objects :: isNull 等价于 x -> Objects.isNull(x)
+  ```
+
+  第三种使用方式，在给定的对象上调用方法，并且参数传递给实例方法。
+  例如：
+
+  ```java
+  System.out :: println 等价于 x-> System.out.println(x)
+  ```
+
+```java
+public class Lambda {
+    public static void main(String[] args) {
+        List<User> list = new ArrayList<User>(){
+            {
+                add(new User("aa",28));
+                add(new User("a",18));
+                add(new User("aaa",38));
+            }
+        };
+
+        
+        list.sort(User :: compare);
+        list.forEach(o-> System.out.println(o.age));
+        
+        System.out.println();
+
+        list.forEach(User :: myString);
+    }
+}
+
+class User{
+    public  String name;
+    public  int age;
+    public static final int time = 2;
+
+    public User(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public static int compare(User a, User b){
+        return a.age - b.age;
+    }
+
+    public void myString() {
+        for (int i = 0; i < 1 ;i++) {
+            System.out.println("User{" +
+                    "name='" + name + '\'' +
+                    ", age=" + age +
+                    '}');
+        }
+        System.out.println();
+        }
+}
+```
+
+
+
+
+
+### 匿名内部类
+
+相当于接口的构造函数
+
+```java
+public class Lambda {
+    public static void main(String[] args) {
+        // 显示类实现接口
+        class Hello01 implements HelloWorld{
+            @Override
+            public void greet(String name) {
+                System.out.println("hello " + name);
+            }
+        }
+        new Hello01().greet("01");
+
+        // 匿名内部类
+        HelloWorld hello02 = new HelloWorld() {
+            @Override
+            public void greet(String name) {
+                System.out.println("hello " + name);
+            }
+        };
+        hello02.greet("02");
+
+        // lambda表达式
+        HelloWorld hello03 = (s)->{
+            System.out.println("hello " + s);
+        };
+        hello03.greet("03");
+    }
+}
+
+interface HelloWorld {
+    public void greet(String name);
+}
+```
+
+list的直接赋值【匿名内部类的构造函数】
+
+```java
+public static void main(String[] args) {
+    // 第一个大括号，内部类
+    List<Integer> list = new ArrayList<Integer>(){
+        // 初始化代码块【作为构造函数】
+        {
+            add(1); // 相当于this.add(1);
+            add(2); // 相当于this.add(2);
+        }
+    };
+}
+
+
+// 初始代码块执行优先级较高，
+// 正因此，对于 list 可以当作一个构造器
+HelloWorld hello02 = new HelloWorld() {
+    int num = 0;
+    {
+        this.greet("jack" );
+        num ++;
+        System.out.println("初始化代码块 ：num 01  = " + num);
+        System.out.println("初始化代码块");
+    }
+    @Override
+    public void greet(String name) {
+        System.out.println("overRide : num = " + num);
+        System.out.println("overRide : hello " + name);
+    }
+
+};
+hello02.greet("tom");
+```
+
+### 表达式对数值封闭
+
+表达式对数值封闭，对变量不封闭
+
+【但是必须是 final 或者 隐形的final 才可以】
+
+```java
+// 例子1
+public class Test {
+    static int num = 99; // static 缺省了 final
+    public static void main(String[] args) {
+        num++;
+        Consumer<Integer> consumer = (o) -> {
+            System.out.println(num);
+        };
+
+        new ArrayList<Integer>(){{
+            add(1);
+            add(2);
+        }}.forEach(consumer);
+        // 100 ；100
+    }
+}
+
+// 例子2
+public static void main(String[] args) {
+    int num = 99;
+    // 注释掉 num++,可以编译 打印99 99
+    // 放出 num++，不可编译，因为不是 final，也没有隐形 final
+    // num++;
+    Consumer<Integer> consumer = (o) -> {
+        System.out.println(num);
+    };
+
+    new ArrayList<Integer>(){{
+        add(1);
+        add(2);
+    }}.forEach(consumer);
+}
+```
+
+
+
+## stream
+
+### 特性
+
+- 不是数据结构，不保存数据
+
+- 不会改变数据源，最后会输出另一个对象来保存（peek修改了）
+- 惰性求值，只对操作进行记录，最后才会执行计算
+
+```java
+List<String> peopleList = new ArrayList<String>(){{
+            add("a,20");
+            add("b,29");
+        }};
+
+// peek修改了
+System.out.println("before");
+List<People> list = peopleList.stream().map(People::new).sorted((o1, o2) -> o1.age - o2.age).collect(Collectors.toList());
+list.forEach(o-> System.out.println( o.toString()));
+System.out.println("ing");
+list.stream().peek(o->o.age = 100).forEach(o-> System.out.println(o.toString()));
+System.out.println("after");
+list.forEach(o-> System.out.println( o.toString()));
+
+// sout
+before
+People{name='a', age=20}
+People{name='b', age=29}
+ing
+People{name='a', age=100}
+People{name='b', age=100}
+after
+People{name='a', age=100}
+People{name='b', age=100}
+```
+
+
+
+### 创建流
+
+```java
+// collection
+List<Integer> list = new ArrayList<Integer>(){{
+    add(1);
+    add(2);
+    add(3);
+    add(4);
+}};
+list.parallelStream();
+list.stream();
+
+// array
+int[] nums = new int[10];
+Arrays.stream(nums);
+
+// Stream 类
+Stream.of(1,2,3);
+Stream.of("a","b");
+
+Stream.generate(new Supplier<Double>() {
+    @Override
+    public Double get() {
+        return Math.random();
+    }
+});
+```
+
+
+
+### 流操作
+
+#### 中间操作：可以返回流的，链式操作
+
+- filter  limit  skip  distinct  sorted   peek
+
+```java
+List<Integer> list = new ArrayList<Integer>(){{
+            add(1);
+            add(2);
+            add(3);
+            add(41);
+            add(32);
+            add(0);
+        }};
+
+// 常规操作
+Stream<Integer> stream = list.stream().skip(1).filter(o->o!=0).distinct().sorted().limit(2);
+stream.forEach(o -> System.out.print(o + " "));
+System.out.println();
+
+list.forEach(o-> System.out.println(o));
+list.stream().distinct().sorted().map(String::valueOf).forEach(o-> System.out.println(o.charAt(0)));
+```
+
+
+
+- map操作
+  - map: 实现的 function接口，改变数据类型
+  - peek:实现的 consumer接口。改变数据内部属性等等
+
+```java
+// map功能：将元素从一种类型变成另一种类型
+// 实现接口时 Function<T, R> ，实现其apply方法
+List<String> peopleList = new ArrayList<String>(){{
+add("a,20");
+add("b,29");
+add("c,21");
+add("d,22");
+add("e,29");
+add("f,21");
+}};
+
+// lambda 表达式 实现 
+peopleList.stream().map(
+o -> new People(o.split(",")[0],Integer.valueOf(o.split(",")[1]))
+).forEach(o-> System.out.println(o.toString()));
+
+// 引用构造方法 实现
+peopleList.stream().map(People::new).sorted((o1, o2) -> o1.age - o2.age)
+.forEach(o-> System.out.println(o.toString()));
+
+// people 类定义
+class People{
+    public String name;
+    public int age;
+
+    public People(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public People(String str) {
+        this.name = str.split(",")[0];
+        this.age = Integer.valueOf(str.split(",")[1]);
+    }
+
+    @Override
+    public String toString() {
+        return "People{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+
+
+#### 终端操作：结束操作并返回
+
+- anyMatch()
+- allMatch()
+- noneMatch()
+
+```java
+public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("周杰伦");
+        list.add("王力宏");
+        list.add("陶喆");
+        list.add("林俊杰");
+
+boolean  anyMatchFlag = list.stream().anyMatch(element -> element.contains("王"));
+boolean  allMatchFlag = list.stream().allMatch(element -> element.length() > 1);
+boolean  noneMatchFlag = list.stream().noneMatch(element -> element.endsWith("沉"));
+System.out.println(anyMatchFlag);
+System.out.println(allMatchFlag);
+System.out.println(noneMatchFlag);
+```
+
+- reduce操作
+
+  三种重载方法
+
+  ```java
+  public static void main(String[] args) {
+          List<Integer> list = new ArrayList<Integer>(){{
+              add(4);
+              add(41);
+              add(5);
+              add(10);
+          }};
+          int res = 0;
+  
+          // 进行累加操作，a，b是先后顺序
+          res = list.stream().reduce((a,b)->a+b).get();
+          System.out.println("res = " + res); // 60
+  
+          // 增加了初始值
+          res = list.stream().reduce(100,(a,b)->a+b);
+          System.out.println("res = " + res); // 160
+  
+          // 弥补1、2不足，摆脱了返回值类型的限制
+          // 第1个方法，返回的是optional类型，所以需要 get 取出
+          // 第2个方法，有了初始值，所以不会出 null ，因此可以直接取出
+          // 第三个可以指定返回类型
+          long resLong = list.stream().reduce(100L,(a,b)->a+b,(a,b)->0L);
+          System.out.println("res = " + resLong); // 160
+  
+          // eg2
+          List<Integer> numList = Arrays.asList(1, 2, 3, 4, 5, 6);
+          ArrayList<String> result = numList.stream().reduce(new ArrayList<String>(), (a, b) -> {
+              a.add("element-" + Integer.toString(b));
+              return a;
+          }, (a, b) -> null);
+          System.out.println(result);
+      }
+  ```
+
+  
+
+- collect操作
+
+  流转会数组或集合
+
+  - .toArray(String[]::new)【转成数组】
+  - .collect(Collectors.toList());【转成list】
+  -  .collect(Collectors.toCollection(ArrayList::new)); 【转成 arrayList】
+
+## optional
+
+
+
+
+
+
+
+## metaSpace
+
+
+
+
+
