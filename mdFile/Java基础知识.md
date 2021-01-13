@@ -904,17 +904,310 @@ System.out.println(noneMatchFlag);
   - .collect(Collectors.toList());【转成list】
   -  .collect(Collectors.toCollection(ArrayList::new)); 【转成 arrayList】
 
-## optional
+
+
+# Java IO
+
+https://www.cnblogs.com/CQqf/p/10795656.html
+
+节点流
+
+- 字节流
+- 字符流
+
+处理流
+
+- 缓存流
+- 对象流
 
 
 
+## 字节流
+
+### 基础分类
+
+- ByteArrayInputStream
+- FileInputStream
+- StringBufferInputStream（@Deprecated）
 
 
 
+- PipedInputStream 【线程通信】
+- BufferInputStream【装饰类】
+- FilterInputStream 及其子类【装饰类】
+- ObjectInputStream【对象流-序列化】
 
-## metaSpace
+输出基本一致对应
+
+### IO对比
+
+![1610559448317](C:\Users\zwx\AppData\Roaming\Typora\typora-user-images\1610559448317.png)
 
 
 
+### 实战
 
+这是IO读取的基本框架
+
+- 选择 合适 输入输出流
+
+- 设置 buffer
+
+- while循环条件
+
+  while( (len= is.read(buffer)) != -1)
+
+- while循环体
+
+  os.write(buffer,0,len);
+
+- finally内关闭流
+
+```java
+// 字节流 - fileinputStream （本地文件）
+InputStream is = null;
+OutputStream os = null;
+
+try {
+    is = new FileInputStream("start");
+    os = new FileOutputStream("end");
+
+    byte[] buffer = new byte[4];
+    int len = 0;
+    while( (len= is.read(buffer)) != -1){
+        os.write(buffer,0,len);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    os.close();
+    is.close();
+}
+
+// 字节流 - 字符数组
+InputStream is = null;
+OutputStream os = null;
+byte[] input = new byte[8];
+for (int i = 0; i < 8; i++) {
+    input[i] = (byte) ('a' +  i);
+}
+
+try {
+    is = new ByteArrayInputStream(input);
+    os = new ByteArrayOutputStream(4);
+
+    int len = 0;
+    byte[] buf = new byte[2];
+    while ((len = is.read(buf))!= -1){
+        os.flush();
+        os.write(buf,0,len);
+    }
+    System.out.println(os.toString());
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    os.close();
+    is.close();
+}
+```
+
+read多种方式
+
+- 读取 字符
+- 读取 buffer数组
+- 读取buffer数组，并指定偏置
+
+```java
+// 测试 read 三种方法
+InputStream is = null;
+OutputStream os = null;
+
+try {
+    is = new FileInputStream("start"); // abcd
+    os = new FileOutputStream("end"); // 空文件
+
+    // 使用 read() 一个一个字符读取
+    // 返回：一个字节（-1-255）
+    //int len = is.read();
+    // os.write(len);
+
+    // read(byte[]) ，读入字节数组
+    // 返回：实际读入的字节数
+    int len = 0;
+
+    byte[] buf = new byte[8];
+    len = is.read(buf);//4,尽管buffer有8个位置，但是总共就只有4个字符
+
+    //byte[] buf = new byte[2];
+    //len = is.read(buf);//2, buffer有2个位置，本次只读到ab，需要再读一次，才能读全abcd
+
+    os.write(buf,0,len);
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    os.close();
+    is.close();
+}
+```
+
+
+
+## 字符流
+
+### 基础分类
+
+- CharArrayReader
+- StringReader
+- FileReader【实际是通过 字符流转字节流 实现的】
+
+
+
+- InputStreamReader【字符流 转 字节流】
+
+
+
+- PipedReader【线程通信】
+- BufferReader【装饰类】
+- FilterReader及其子类【装饰类】
+- ObjectInputStream【对象流-序列化】
+
+Writer 基本与之对应
+
+### IO对比
+
+![1610556538120](C:\Users\zwx\AppData\Roaming\Typora\typora-user-images\1610556538120.png)
+
+
+
+### 实战
+
+```java
+// 字符流 字符串
+Reader reader = null;
+Writer writer = null;
+try {
+    reader = new StringReader("I am you father");
+    writer = new StringWriter();
+    int len = 0;
+    while ((len = reader.read())!= -1){
+        // 注意：这里 flush ，下面还会有输出
+        // 原因：StringWriter 里的 flush 方法是空方法，没卵用
+        writer.flush()
+        writer.write(len);
+    }
+    System.out.println(writer.toString());
+} catch (IOException e){
+    e.printStackTrace();
+} finally {
+    reader.close();
+    writer.close();
+}
+```
+
+FileReader 
+
+```java
+File src = new File("srcFile");
+File dst = new File("dst");
+
+FileReader fr = new FileReader(src);
+FileWriter fw = new FileWriter(dst);
+char[] buffer = new char[25];
+
+int len = 0;
+while ((len = fr.read(buffer))!=-1){
+    fw.write(buffer,0,len);
+    fw.flush();
+}
+```
+
+
+
+## 字符字节转换
+
+### 构造方法：
+
+- 创建一个使用默认字符集的 InputStreamReader 
+
+  InputStreamReader(InputStream in)
+
+- 创建使用给定字符集的 InputStreamReader
+  InputStreamReader(InputStream in, Charset cs)
+
+- 创建使用给定字符集解码器的 InputStreamReader
+  InputStreamReader(InputStream in, CharsetDecoder dec)
+
+- 创建使用指定字符集的 InputStreamReader
+
+  InputStreamReader(InputStream in, String charsetName)
+
+### 特有方法：
+
+- 返回此流使用的字符编码的名称 
+
+  String getEncoding() 
+
+### 实战
+
+```java
+PrintWriter out = new PrintWriter(System.out,false);
+// 将键盘输入的字节流 转换 字符流 ，使用 缓冲流
+BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+String line = null;
+while ((line = br.readLine())!=null){
+    if("exit".equals(line)){
+        System.exit(1);
+    }
+    out.println(line);
+    // 如果 PrintWrite 设置成 autoflush 为 true，就不需要这一行
+    out.flush();
+}
+```
+
+
+
+## Buffer流【高效】
+
+采用了装饰者模式
+
+### BufferReader
+
+BufferedReader：字符缓冲流，从字符输入流中读取文本，缓冲各个字符，从而实现字符、数组和行的高效读取。
+
+#### 构造方法
+
+- 创建一个使用默认大小输入缓冲区的缓冲字符输入流
+  BufferedReader(Reader in)
+- 创建一个使用指定大小输入缓冲区的缓冲字符输入流
+  BufferedReader(Reader in, int sz)
+
+#### 特有方法
+
+- 读取一个文本行
+  String readLine()
+
+#### 2）.BufferedWriter
+
+BufferedWriter：字符缓冲流，将文本写入字符输出流，缓冲各个字符，从而提供单个字符、数组和字符串的高效写入。
+
+#### 特有方法
+
+- 写入一个行分隔符
+  void newLine() 
+
+### 实战
+
+```java
+String readLine()
+    //生成字符缓冲流对象
+BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("test.txt")));
+String str;
+//一次性读取一行
+while ((str = reader.readLine()) != null) {
+    System.out.println(str);// 爱生活，爱Android
+}
+
+//关闭流
+reader.close();
+```
 
