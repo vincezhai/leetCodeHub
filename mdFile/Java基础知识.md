@@ -1211,3 +1211,161 @@ while ((str = reader.readLine()) != null) {
 reader.close();
 ```
 
+
+
+
+
+# 线程池及其异常
+
+https://www.cnblogs.com/dolphin0520/category/1426288.html
+
+## 线程池几种方式
+
+- Executors【工具类】【提供静态方式创建线程池】【线程池工厂】
+
+  - newFixedThreadPool ：固定大小的线程池，结束会补充（LinkedBlockingQueue，OOM）
+  - newSingleThreadExecutor：单线程池。这个线程挂掉了，在补充一个进来（LinkedBlockingQueue，OOM）
+  - newCachedThreadPool：缓存线程池，回收不用的线程，大小不限，（poolSize，OOM)
+  - newScheduledThreadPool：周期线程池，大小不限，(poolSize,OOM)
+  - newSingleThreadScheduledExecutor：上面两者结合
+
+- ThreadPoolExecutor 【自定义线程池】
+
+  ```java
+  /**
+       * @param corePoolSize the number of threads to keep in the pool, even
+       *        if they are idle, unless {@code allowCoreThreadTimeOut} is set
+  　　　　　　　　 核心线程数，核心线程数永远小于等于最大线程数。
+  　　　　　　　　 缓冲队列不满时，线程池的线程数用远小于等于核心线程数。
+  　　　　　　　　 缓冲队列满时，线程池会在核心线程数的基础上再创建线程，但小于最大线程数
+  
+       * @param maximumPoolSize the maximum number of threads to allow in the
+       *        pool
+  　　　　　　　　 线程池最大线程数
+       * @param keepAliveTime when the number of threads is greater than
+       *        the core, this is the maximum time that excess（过量） idle（空闲） threads
+       *        will wait for new tasks before terminating.
+  　　　　　　　　 线程空闲存活时长
+       * @param unit the time unit for the {@code keepAliveTime} argument
+  　　　　　　　　 线程存活时长单位
+       * @param workQueue the queue to use for holding tasks before they are
+       *        executed.  This queue will hold only the {@code Runnable}
+       *        tasks submitted by the {@code execute} method.
+                缓冲队列，BlockingQueue接口的实现类，根据需求选择他的实现类即可，细节有必要去找度娘。
+  　　　　　　　　 常用BlockingQueue有LinkedBlockingQueue和SynchronousQueue
+       * @param threadFactory the factory to use when the executor
+       *        creates a new thread
+  　　　　　　　　 线程工厂，用来创建线程的，使用默认的就好
+       * @param handler the handler to use when execution is blocked
+       *        because the thread bounds and queue capacities are reached
+  　　　　　　　　 缓冲队列已满且已经最大线程数，这时的处理策略
+  　　　　　　　　 RejectedExecutionHandler下有多个实现类，根据所需决定
+  　　 */
+      public ThreadPoolExecutor(int corePoolSize,// 核心线程数
+                                int maximumPoolSize,// 最大线程数
+                                long keepAliveTime,// 空闲存活时间
+                                TimeUnit unit,// 时长单位
+                                BlockingQueue<Runnable> workQueue,// 缓冲队列
+                                ThreadFactory threadFactory,// 线程工厂
+                                RejectedExecutionHandler handler// 满队列处理策略
+                               ) {
+          if (corePoolSize < 0 ||
+              maximumPoolSize <= 0 ||
+              maximumPoolSize < corePoolSize ||
+              keepAliveTime < 0)
+              throw new IllegalArgumentException();
+          if (workQueue == null || threadFactory == null || handler == null)
+              throw new NullPointerException();
+          this.acc = System.getSecurityManager() == null ?
+                  null :
+                  AccessController.getContext();
+          this.corePoolSize = corePoolSize;
+          this.maximumPoolSize = maximumPoolSize;
+          this.workQueue = workQueue;
+          this.keepAliveTime = unit.toNanos(keepAliveTime);
+          this.threadFactory = threadFactory;
+          this.handler = handler;
+      }
+  ```
+
+  
+
+## 实战
+
+### 构造线程池
+
+```java
+ ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10,10L, TimeUnit.SECONDS,
+new ArrayBlockingQueue<Runnable>(10) );
+for (int i = 0; i < 20; i++) {
+    Thread thread = new Thread(()-> {
+        System.out.println("Runnable : " + Thread.currentThread().getName());
+        try {
+            Thread.currentThread().sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    });
+    executor.execute(thread);
+    System.out.println("executor.getPoolSize() = " + executor.getPoolSize());
+    System.out.println("executor.getQueue().size() = " + executor.getQueue().size());
+    System.out.println("executor.getCompletedTaskCount() = " + executor.getCompletedTaskCount());
+    System.out.println();
+}
+executor.shutdown();
+```
+
+### 线程池计算返回数值
+
+```java
+public class ThreadPoolAndException {
+    public static void main(String[] args) {
+        // 盛放结果
+        List<String> res = new ArrayList<>();
+        // 自定义线程池
+       ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10,10L, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<Runnable>(10) );
+        
+        for (int i = 0; i < 10; i++) {
+            Callable thread = new Mytask(i);
+            Future<String> future = executor.submit(thread);
+            // 使用 Feature.get 方法，处理异常
+            try {
+                res.add(future.get());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        executor.shutdown();
+
+        // 输出展示
+        res.stream().forEach(o-> System.out.println(o));
+    }
+}
+
+class Mytask implements Callable{
+    int num;
+
+    public Mytask(int num) {
+        this.num = num;
+    }
+
+    @Override
+    public String call() throws Exception {
+        String str = "";
+        for (int i = 0; i <= num; i++) {
+            str += i;
+        }
+        return str;
+    }
+}
+```
+
+### 异常处理
+
+- execute的任务，利用 uncaughtExceptionHandler 捕捉异常
+- submit的任务，
+  - 使用uncaughtExceptionHandler  **不会** 捕捉
+  - 使用 Feature.get 方法，捕捉异常，
