@@ -1,35 +1,22 @@
 package kuang;
 
+import java.text.Collator;
 import java.util.*;
 
 public class Test {
     public static void main(String[] args) {
         List<Entity> list = new ArrayList<Entity>(){{
-            add(new Entity("china",100,"yd",50));
-            add(new Entity("china",100,"ld",20));
-            add(new Entity("china",100,"dx",30));
-
-            add(new Entity("usa",50,"ss",20));
-            add(new Entity("usa",50,"nhk",15));
-            add(new Entity("usa",50,"cell",15));
-
-            add(new Entity("uk",10,"ss",1));
-            add(new Entity("uk",10,"sky",5));
-            add(new Entity("uk",10,"digi",4));
-
-            add(new Entity("thailand",100,"ss",10));
-            add(new Entity("thailand",100,"sky",50));
-            add(new Entity("thailand",100,"digi",40));
-
+            add(new Entity("中国",0,"中国",0));
+            add(new Entity("重庆",0,"重庆",0));
+            add(new Entity("安徽",0,"安徽",0));
+            add(new Entity("上海",0,"上海",0));
         }};
 
         list.stream().sorted(
-                Comparator.comparing(Entity::getCountryTotalNum,Comparator.reverseOrder()).
-                        thenComparing(Entity::getCountryName).
-                        thenComparing(Entity::getCustomerTotalNum,Comparator.reverseOrder()).
-                        thenComparing(Entity::getCustomerName)
-        ).forEach(o-> System.out.println(o.toString()));
-
+                (o1,o2)-> Collator.getInstance(Locale.CHINA).
+                                compare(o1.getCountryName().replace("重庆","冲庆"),
+                                        o2.getCountryName().replace("重庆","冲庆"))).
+                forEach(o-> System.out.println(o));
 
 
     }
