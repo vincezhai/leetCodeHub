@@ -1,4 +1,4 @@
 obey the rule of .gitignore
 .idea
-.out/*
+/out
 *.iml
