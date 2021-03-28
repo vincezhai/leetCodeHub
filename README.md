@@ -1,5 +1,5 @@
 # leetCodeHub
-This is my leetcode record hub.
+This is my leetcode record hub!
 ## record
 ### git-command
 - git reset --hard  head^ : 恢复上一个版本，直接版本回退，丢失所有改动
