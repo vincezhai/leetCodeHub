@@ -1,13 +1,12 @@
 package leetcode.test.reflectTest;
 
-import javax.annotation.processing.SupportedAnnotationTypes;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
 public class CommonUtils {
-    public static void formatEntity (Entity entity) {
+    public static void formatEntity (Object obj) {
         // class 对象
-        Class cl = entity.getClass();
+        Class cl = obj.getClass();
 
         // 类注解对象
         NeedConverted annotation = (NeedConverted)cl.getAnnotation(NeedConverted.class);
@@ -32,12 +31,12 @@ public class CommonUtils {
                 }
 
                 // 确定当前字段信息(名字-内容)
-                String currStr = (String) field.get(entity);
+                String currStr = (String) field.get(obj);
                 String fieldName = field.getName();
 
                 // 替换ALL
                 if("ALL".equals(currStr)) {
-                    field.set(entity,null);
+                    field.set(obj,null);
                 }
 
                 // 字符串转换数组
@@ -46,7 +45,7 @@ public class CommonUtils {
                     // 找到 当前字段 对应的 转化后数组 字段
                     Field listFieldName = cl.getDeclaredField(strToListFieldsMap.get(fieldName) );
                     listFieldName.setAccessible(true);
-                    listFieldName.set(entity, currStr.split(","));
+                    listFieldName.set(obj, currStr.split(","));
                 }
             }
         } catch (IllegalAccessException | NoSuchFieldException e) {

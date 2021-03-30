@@ -5,6 +5,13 @@ public class Test {
         Entity entity = new Entity();
         System.out.println("entity.toString() = " + entity.toString());
         CommonUtils.formatEntity(entity);
-        System.out.println("\n"+ "entity.toString() = " + entity.toString());
+        System.out.println("entity.toString() = " + entity.toString());
+
+        System.out.println();
+
+        EntityCopy entityCopy = new EntityCopy();
+        System.out.println("entityCopy.toString() = " + entityCopy.toString());
+        CommonUtils.formatEntity(entityCopy);
+        System.out.println("entityCopy.toString() = " + entityCopy.toString());
     }
 }
