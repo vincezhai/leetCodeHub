@@ -63,30 +63,7 @@ public class ErChaShuDeShenDuLcof{
  * }
  */
     class Solution {
-        /*public int maxDepth(TreeNode root) {
-            if(root == null){
-                return 0;
-            }
-            int[] res = new int[]{1};
-            return dfs(root, res);
-        }*/
-
-        /*private int dfs(TreeNode root, int[] res) {
-            int org = res[0];
-            if(root.left != null){
-                res[0]++;
-                dfs(root.left, res);
-            }
-            int tmp = res[0];
-            res[0] = org;
-            if(root.right != null){
-                res[0]++;
-                dfs(root.right, res);
-            }
-            return Math.max(res[0], tmp);
-        }*/
-
-        public int maxDepth(TreeNode root) {
+        public int maxDepth_bak(TreeNode root) {
             if(root == null){
                 return 0;
             }
