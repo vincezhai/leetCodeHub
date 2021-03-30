@@ -1,17 +1,10 @@
 package leetcode.test.reflectTest;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
-// @NeedConverted
+// 使用注解 维护 转换表
+@NeedConverted(strField = {"friend","num","something"} , listField = {"friendList","numList","somethings"} )
 public class Entity {
-    // 维护一个需要转换的表
-    public static final HashMap<String, String> STR_TO_LIST_FIELDS = new HashMap(){{
-        put("friend","friendList");
-        put("num","numList");
-        put("something","somethings");
-    }};
-
     private String name1 = "vince";
     private String name2 = "ALL";
 
