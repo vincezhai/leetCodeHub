@@ -8,6 +8,9 @@ public class EntityCopy {
     private String name1 = "vince";
     private String name2 = "ALL";
 
+    private String other = "ALL";
+    private String city = "jz";
+
     private int age = 25;
 
     private String friend = "a,b,c,d,e";
@@ -21,6 +24,8 @@ public class EntityCopy {
         return "EntityCopy{" +
                 "name1='" + name1 + '\'' +
                 ", name2='" + name2 + '\'' +
+                ", other='" + other + '\'' +
+                ", city='" + city + '\'' +
                 ", age=" + age +
                 ", friend='" + friend + '\'' +
                 ", friendList=" + Arrays.toString(friendList) +
