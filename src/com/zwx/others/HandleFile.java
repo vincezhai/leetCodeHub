@@ -19,7 +19,6 @@ public class HandleFile {
         try (BufferedReader fr = new BufferedReader(new FileReader(inputFile));
              FileWriter fw = new FileWriter(outFile);
         ){
-            int line = 1;
             while ((buffer = fr.readLine()) != null){
                 fw.write(convertSr(buffer) + '\n');
             }

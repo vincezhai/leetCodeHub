@@ -62,9 +62,7 @@ class Solution {
         if(root == null){
             return 0;
         }
-        int left = maxDepth(root.left);
-        int right = maxDepth(root.right);
-        return Math.max(left, right) + 1;
+        return Math.max(maxDepth(root.right), maxDepth(root.left)) + 1;
     }
 }
 //leetcode submit region end(Prohibit modification and deletion)

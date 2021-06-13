@@ -77,15 +77,17 @@ class Solution {
         return check(root, root);
     }
 
-    private boolean check(TreeNode one, TreeNode two) {
-        if(one == null && two == null){
+    private boolean check(TreeNode p, TreeNode q) {
+        if(p == null && q == null) {
             return true;
         }
-        if(one == null || two == null){
+        if(p == null && q != null) {
             return false;
         }
-        boolean selfIsEqual = (one.val == two.val);
-        return selfIsEqual && check(one.left, two.right) && check(one.right, two.left);
+        if(p != null && q == null) {
+            return false;
+        }
+        return (p.val == q.val) && check(p.left, q.right) && check(p.right, q.left);
     }
 }
 //leetcode submit region end(Prohibit modification and deletion)
